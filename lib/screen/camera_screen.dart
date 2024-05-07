@@ -1,14 +1,38 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class CameraScreen extends StatelessWidget {
+  final File? photo;
+
+  const CameraScreen({Key? key, this.photo}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('촬영 화면'),
+        title: Text('물고기'),
       ),
       body: Center(
-        child: Text('이곳은 카메라 촬영 화면입니다.'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            photo != null
+                ? Image.file(
+              photo!,
+              width: 300,
+              height: 300,
+              fit: BoxFit.cover,
+            )
+                : Container(),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // 정체 알아보기 버튼을 눌렀을 때의 동작 구현
+              },
+              child: Text('정체 알아보기'),
+            ),
+          ],
+        ),
       ),
     );
   }

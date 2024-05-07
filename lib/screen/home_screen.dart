@@ -1,9 +1,47 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'camera_screen.dart';
+import 'package:image_picker/image_picker.dart';
 import 'imagepick_screen.dart';
+import 'camera_screen.dart';
 
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
 
-class HomeScreen extends StatelessWidget {
+class _HomeScreenState extends State<HomeScreen> {
+  Future<void> _getImageFromGallery() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ImagePickScreen(image: File(pickedImage.path)),
+        ),
+      );
+    } else {
+      print('선택된 이미지 없음');
+    }
+  }
+
+  Future<void> _takePhotoWithCamera() async {
+    final picker = ImagePicker();
+    final takenPhoto = await picker.pickImage(source: ImageSource.camera);
+
+    if (takenPhoto != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CameraScreen(photo: File(takenPhoto.path)),
+        ),
+      );
+    } else {
+      print('촬영된 이미지 없음');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,30 +54,23 @@ class HomeScreen extends StatelessWidget {
           children: <Widget>[
             Image.asset(
               'asset/image/fish_image2.png',
-              width: 150, // 이미지의 가로 크기 조절
-              height: 150, // 이미지의 세로 크기 조절
+              width: 150,
+              height: 150,
             ),
-            SizedBox(height: 20), // 이미지와 텍스트 사이의 간격 조정
+            SizedBox(height: 20),
             Text(
               '당신이 잡은 물고기, 정체가 뭘까요?',
               style: TextStyle(fontSize: 24),
             ),
-            SizedBox(height: 20), // 텍스트와 버튼 사이의 간격 조정
+            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Column(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.crop_original), // 갤러리 버튼에 카메라 아이콘 추가
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ImagePickScreen(),
-                          ),
-                        );
-                      },
+                      icon: Icon(Icons.photo_library),
+                      onPressed: _getImageFromGallery,
                     ),
                     Text(
                       '갤러리',
@@ -51,15 +82,8 @@ class HomeScreen extends StatelessWidget {
                 Column(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.add_a_photo), // 촬영 버튼에 카메라 아이콘 추가
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CameraScreen(),
-                          ),
-                        );
-                      },
+                      icon: Icon(Icons.add_a_photo),
+                      onPressed: _takePhotoWithCamera,
                     ),
                     Text(
                       '촬영하기',
