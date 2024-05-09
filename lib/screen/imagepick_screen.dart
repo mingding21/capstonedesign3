@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:capstonedesign3/process/classification.dart';
 
 class ImagePickScreen extends StatelessWidget {
   final File? image;
@@ -27,7 +28,14 @@ class ImagePickScreen extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // 정체 알아보기 버튼을 눌렀을 때의 동작 구현
+                if (image != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ClassificationScreen(image: image!), // ClassificationScreen 클래스에 image 매개변수 전달
+                    ),
+                  );
+                }
               },
               child: Text('정체 알아보기'),
             ),
