@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 
 class CameraScreen extends StatelessWidget {
   final File? photo;
+  final double targetWidth;
+  final double targetHeight;
 
-  const CameraScreen({Key? key, this.photo}) : super(key: key);
+  const CameraScreen({Key? key, this.photo, this.targetWidth = 300, this.targetHeight = 300}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +19,16 @@ class CameraScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             photo != null
-                ? Image.file(
-              photo!,
-              width: 300,
-              height: 300,
-              fit: BoxFit.cover,
+                ? Container(
+              width: targetWidth,
+              height: targetHeight,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black), // 여백을 위한 테두리 추가
+              ),
+              child: Image.file(
+                photo!,
+                fit: BoxFit.contain, // 이미지를 자르지 않고 여백이 생기도록 설정
+              ),
             )
                 : Container(),
             SizedBox(height: 20),
