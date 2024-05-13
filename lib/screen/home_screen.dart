@@ -1,47 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'imagepick_screen.dart';
-import 'camera_screen.dart';
+import 'package:capstonedesign3/screen/imagepick_screen.dart';
+import 'package:capstonedesign3/screen/camera_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  Future<void> _getImageFromGallery() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedImage != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ImagePickScreen(image: File(pickedImage.path)),
-        ),
-      );
-    } else {
-      print('선택된 이미지 없음');
-    }
-  }
-
-  Future<void> _takePhotoWithCamera() async {
-    final picker = ImagePicker();
-    final takenPhoto = await picker.pickImage(source: ImageSource.camera);
-
-    if (takenPhoto != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CameraScreen(photo: File(takenPhoto.path)),
-        ),
-      );
-    } else {
-      print('촬영된 이미지 없음');
-    }
-  }
-
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +31,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.photo_library),
-                      onPressed: _getImageFromGallery,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ImagePickScreen()),
+                        );
+                      },
                     ),
                     Text(
                       '갤러리',
@@ -83,7 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.add_a_photo),
-                      onPressed: _takePhotoWithCamera,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => CameraScreen()),
+                        );
+                      },
                     ),
                     Text(
                       '촬영하기',

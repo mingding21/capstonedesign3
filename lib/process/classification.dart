@@ -37,9 +37,7 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
               ),
               child: Image.file(
                 widget.image!,
-                width: widget.targetWidth,
-                height: widget.targetHeight,
-                fit: BoxFit.cover, // 이미지를 자르지 않고 여백이 생기도록 설정
+                fit: BoxFit.contain, // 이미지를 자르지 않고 여백이 생기도록 설정
               ),
             ),
             SizedBox(height: 20),
@@ -74,7 +72,7 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
       _interpreter = await Interpreter.fromAsset('asset/model/fish_cnn_model_real.tflite');
 
       print('모델 로딩 완료');
-      _classifyImage(widget.image!);
+      _classifyImage(widget.image!); // 이미지가 여기서 전달되었으므로 따로 선택할 필요 없음
     } catch (e) {
       print('모델 로딩 실패: $e');
       setState(() {
