@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:capstonedesign3/screen/fishinfo_screen.dart';
 
 class ClassificationScreen extends StatefulWidget {
   final File? image;
@@ -15,7 +17,7 @@ class ClassificationScreen extends StatefulWidget {
 }
 
 class _ClassificationScreenState extends State<ClassificationScreen> {
-  List<String>? _outputs;
+  List<dynamic>? _outputs;
   bool _loading = false;
   late Interpreter _interpreter;
 
@@ -44,9 +46,27 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
             _loading
                 ? CircularProgressIndicator()
                 : _outputs != null
-                ? Text(
-              "분류 결과: ${_outputs![0]}",
-              style: TextStyle(fontSize: 20),
+                ? Column(
+              children: [
+                Text(
+                  "분류 결과: ${_outputs![0]}",
+                  style: TextStyle(fontSize: 20),
+                ),
+                Text(
+                  "정확도: ${( _outputs![1] * 100).toStringAsFixed(2)}%",
+                  style: TextStyle(fontSize: 20),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => FishInfoScreen(fishName: _outputs![0])),
+                    );
+                  },
+                  child: Text('물고기 정보'),
+                ),
+              ],
             )
                 : Container(),
           ],
@@ -104,7 +124,7 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
     }
   }
 
-  Future<List<String>> _runInference(File image) async {
+  Future<List<dynamic>> _runInference(File image) async {
     // 이미지 전처리
     var inputImage = await _preprocessImage(image);
 
@@ -117,18 +137,33 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
     var classLabels = ['Black Sea Sprat', 'Gilt-Head Bream', 'Hourse Mackerel', 'Red Mullet', 'Red Sea Bream', 'Sea Bass', 'Shrimp', 'Striped Red Mullet', 'Trout'];
     var predictedClassName = classLabels[predictedClassIndex];
 
-    return [predictedClassName];
+    // 정확도 계산
+    var confidence = output[0][predictedClassIndex];
+    var accuracy = confidence / output[0].reduce((curr, next) => curr + next);
+
+    return [predictedClassName, accuracy];
   }
 
   Future<Uint8List> _preprocessImage(File image) async {
     // 이미지를 224x224 크기로 변환
-    var bytes = await image.readAsBytes();
-    return Uint8List.fromList(bytes);
+    var rawImage = await image.readAsBytes();
+    var decodedImage = img.decodeImage(rawImage);
+
+    var resizedImage = img.copyResize(decodedImage!, width: 224, height: 224);
+
+    // 이미지를 TensorFlow 모델의 입력 형식에 맞게 정규화
+    var normalizedBytes = resizedImage.getBytes();
+    var floatList = Float32List(224 * 224 * 3);
+    for (var i = 0; i < 224 * 224 * 3; i++) {
+      floatList[i] = (normalizedBytes[i] - 127.5) / 127.5;
+    }
+
+    return floatList.buffer.asUint8List();
   }
 
   @override
   void dispose() {
-    _interpreter.close(); // 메모리 누수 방지를 위해 모델을 닫습니다.
+    _interpreter.close(); // 메모리 누수 방지, 모델 닫기
     super.dispose();
   }
 }
