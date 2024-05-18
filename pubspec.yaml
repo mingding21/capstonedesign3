@@ -30,7 +30,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  http: ^0.13.3
+  html: ^0.15.4
+  googleapis: ^5.0.0
+  googleapis_auth: ^1.0.0
+  cached_network_image: ^3.3.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

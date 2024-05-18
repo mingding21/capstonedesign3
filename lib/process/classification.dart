@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:capstonedesign3/screen/fishinfo_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:html/parser.dart' as parser;
+import 'package:html/dom.dart' as dom;
+
 
 class ClassificationScreen extends StatefulWidget {
   final File? image;
