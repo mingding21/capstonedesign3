@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 import 'package:html/dom.dart' as dom;
 
-
 class ClassificationScreen extends StatefulWidget {
   final File? image;
   final double targetWidth;
@@ -24,6 +23,50 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
   List<dynamic>? _outputs;
   bool _loading = false;
   late Interpreter _interpreter;
+
+  Map<String, String> classTranslations = {
+    'Indo-Pacific Tarpon': '풀잉어',
+    'Trout': '송어',
+    'Shrimp': '새우',
+    'Perch': '농어',
+    'Mullet': '숭어',
+    'Grass Carp': '초어',
+    'Striped Red Mullet': '줄무늬 붉은 숭어',
+    'Glass Perchlet': '유리잉어',
+    'Hourse Mackerel': '전갱이',
+    'Sea Bass': '배스',
+    'Gold Fish': '금붕어',
+    'Bangus': '갯농어',
+    'Black Spotted Barb': '검은 점 바브',
+    'Pangasius': '판가시우스',
+    'Goby': '망둥이',
+    'Mosquito Fish': '모기고기',
+    'Gilt-Head Bream': '귀족 도미',
+    'Long-Snouted Pipefish': '긴 주둥이 파이브피쉬',
+    'Red Mullet': '붉은 숭어',
+    'Silver Barb': '실버바브',
+    'Tenpounder': '당멸치',
+    'Mudfish': '미꾸라지',
+    'Indian Carp': '인도 잉어',
+    'Big Head Carp': '대두어',
+    'Freshwater Eel': '뱀장어',
+    'Silver Perch': '실버퍼치',
+    'Red Sea Bream': '참돔',
+    'Fourfinger Threadfin': '네날가지',
+    'Knifefish': '칼고기',
+    'Janitor Fish': '',
+    'Catfish': '메기',
+    'Climbing Perch': '등목어',
+    'Snakehead': '가물치',
+    'Gourami': '버들붕어',
+    'Black Sea Sprat': '검정청어',
+    'Jaguar Gapote': '',
+    'Silver Carp': '백련어',
+    'Tilapia': '틸라피아',
+    'Scat Fish': '식분어',
+    'Green Spotted Puffer': '녹색 점박이 복어'
+  };
+
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +96,7 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
                 ? Column(
               children: [
                 Text(
-                  "분류 결과: ${_outputs![0]}",
+                  "분류 결과: ${_outputs![0]} (${classTranslations[_outputs![0]]})",
                   style: TextStyle(fontSize: 20),
                 ),
                 Text(
@@ -93,7 +136,7 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
 
     try {
       // 모델 로딩
-      _interpreter = await Interpreter.fromAsset('asset/model/fish_cnn_model_real.tflite');
+      _interpreter = await Interpreter.fromAsset('asset/model/fish_cnn_model_datasetplus.tflite');
 
       print('모델 로딩 완료');
       _classifyImage(widget.image!); // 이미지가 여기서 전달되었으므로 따로 선택할 필요 없음
@@ -133,13 +176,12 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
     var inputImage = await _preprocessImage(image);
 
     // 추론 실행
-    var output = List.filled(1, List.filled(9, 0.0));
+    var output = List.filled(1, List.filled(40, 0.0));
     _interpreter.run(inputImage, output);
 
     // 예측된 클래스 가져오기
     var predictedClassIndex = output[0].indexOf(output[0].reduce((curr, next) => curr > next ? curr : next));
-    var classLabels = ['Black Sea Sprat', 'Gilt-Head Bream', 'Hourse Mackerel', 'Red Mullet', 'Red Sea Bream', 'Sea Bass', 'Shrimp', 'Striped Red Mullet', 'Trout'];
-    var predictedClassName = classLabels[predictedClassIndex];
+    var predictedClassName = classTranslations.keys.toList()[predictedClassIndex];
 
     // 정확도 계산
     var confidence = output[0][predictedClassIndex];
