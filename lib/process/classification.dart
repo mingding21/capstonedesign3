@@ -67,7 +67,6 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
     'Green Spotted Puffer': '녹색 점박이 복어'
   };
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,24 +94,34 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
                 : _outputs != null
                 ? Column(
               children: [
-                Text(
-                  "분류 결과: ${_outputs![0]} (${classTranslations[_outputs![0]]})",
-                  style: TextStyle(fontSize: 20),
-                ),
-                Text(
-                  "정확도: ${( _outputs![1] * 100).toStringAsFixed(2)}%",
-                  style: TextStyle(fontSize: 20),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => FishInfoScreen(fishName: _outputs![0])),
-                    );
-                  },
-                  child: Text('물고기 정보'),
-                ),
+                if (_outputs![1] < 0.5)
+                  Text(
+                    "오류. 다른 사진을 골라주세요.",
+                    style: TextStyle(fontSize: 20, color: Colors.red),
+                  )
+                else
+                  Column(
+                    children: [
+                      Text(
+                        "분류 결과: ${_outputs![0]} (${classTranslations[_outputs![0]] ?? 'Unknown'})",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Text(
+                        "정확도: ${( _outputs![1] * 100).toStringAsFixed(2)}%",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => FishInfoScreen(fishName: _outputs![0])),
+                          );
+                        },
+                        child: Text('물고기 정보'),
+                      ),
+                    ],
+                  )
               ],
             )
                 : Container(),
