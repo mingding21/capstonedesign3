@@ -80,7 +80,7 @@ class _ClassificationScreenState extends State<ClassificationScreen> {
 
     try {
       // 모델 로딩
-      _interpreter = await Interpreter.fromAsset('asset/model/fish_classification_model_final.tflite');
+      _interpreter = await Interpreter.fromAsset('asset/model/fish_classification_model_real_final.tflite');
 
       print('모델 로딩 완료');
       _classifyImage(widget.image!); // 이미지가 여기서 전달되었으므로 따로 선택할 필요 없음
