@@ -65,7 +65,6 @@ print(f'검증 데이터 세트 : {x_val.shape}')
 # 이미지 전처리 및 데이터 증강
 img_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
     preprocessing_function=tf.keras.applications.mobilenet_v2.preprocess_input,
-    validation_split=0.15,
     rotation_range=20,
     width_shift_range=0.2,
     height_shift_range=0.2,
@@ -79,22 +78,22 @@ img_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
 img_size = (224, 224)
 batch_size = 32
 
-# 클래스 목록 생성
-classes_list = img_df['Labels'].unique().tolist()
+# 클래스 목록 생성 및 정렬
+classes_list = sorted(img_df['Labels'].unique().tolist())
 
 # 훈련 데이터 및 검증 데이터 생성
 train_data = img_datagen.flow_from_dataframe(dataframe=x_train, x_col='FilePaths', y_col='Labels',
                                              target_size=img_size, color_mode='rgb', class_mode='categorical',
-                                             batch_size=batch_size, seed=42, subset='training', classes=classes_list)
+                                             batch_size=batch_size, seed=42, shuffle=False, classes=classes_list)
 
-val_data = img_datagen.flow_from_dataframe(dataframe=x_train, x_col='FilePaths', y_col='Labels',
+val_data = img_datagen.flow_from_dataframe(dataframe=x_val, x_col='FilePaths', y_col='Labels',
                                            target_size=img_size, color_mode='rgb', class_mode='categorical',
-                                           batch_size=batch_size, seed=42, subset='validation', classes=classes_list)
+                                           batch_size=batch_size, seed=42, shuffle=False, classes=classes_list)
 
 # 테스트 데이터 세트 생성
 test_data = img_datagen.flow_from_dataframe(dataframe=x_test, x_col='FilePaths', y_col='Labels',
                                             target_size=img_size, color_mode='rgb', class_mode='categorical',
-                                            batch_size=batch_size, seed=42, classes=classes_list)
+                                            batch_size=batch_size, seed=42, shuffle=False, classes=classes_list)
 
 # 훈련 데이터의 클래스 라벨 인덱스를 가져옴
 class_labels = train_data.class_indices
@@ -130,7 +129,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
 history = model.fit(
     train_data,
     steps_per_epoch=train_data.samples // train_data.batch_size,
-    epochs=20,
+    epochs=10,
     validation_data=val_data,
     validation_steps=val_data.samples // val_data.batch_size
 )
@@ -140,8 +139,8 @@ test_loss, test_accuracy = model.evaluate(test_data)
 print('테스트 정확도는:', test_accuracy * 100, '%')
 
 # 모델 저장
-model.save('fish_classification_model_final.h5')
-print('모델이 fish_classification_model_final.h5 파일로 저장되었습니다.')
+model.save('fish_classification_model_real_final.h5')
+print('모델이 fish_classification_model_real_final.h5 파일로 저장되었습니다.')
 
 # Training Accuracy와 Validation Accuracy 비교 그래프
 plt.plot(history.history['accuracy'], label='Training Accuracy')
